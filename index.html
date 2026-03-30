@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paperjam Leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Login Screen ── -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="lang-switch">
+      <button onclick="setLang('es')" class="active" data-lang="es">ES</button>
+      <button onclick="setLang('en')" data-lang="en">EN</button>
+      <button onclick="setLang('fr')" data-lang="fr">FR</button>
+    </div>
+    <h1><span>Paperjam</span> Leads</h1>
+    <p class="sub" data-i18n="login_sub">Gestiona tus leads de forma simple y potente</p>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label data-i18n="username">Usuario</label>
+        <input type="text" id="loginUser" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label data-i18n="password">Contrasena</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login" data-i18n="login_btn">Iniciar sesion</button>
+      <div id="loginError" class="error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ── App Shell ── -->
+<div id="appShell" class="app" style="display:none">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo"><span>Paperjam</span> Leads</div>
+    <nav>
+      <a href="#" class="active" data-tab="dashboard" onclick="switchTab('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span data-i18n="nav_dashboard">Dashboard</span>
+      </a>
+      <a href="#" data-tab="leads" onclick="switchTab('leads',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span data-i18n="nav_leads">Leads</span>
+      </a>
+      <a href="#" data-tab="pipeline" onclick="switchTab('pipeline',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span data-i18n="nav_pipeline">Pipeline</span>
+      </a>
+      <a href="#" onclick="showQualityGuide();return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span data-i18n="quality_guide">Guia de calidad</span>
+      </a>
+      <a href="#" onclick="showSettings();return false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="settings">Ajustes</span>
+      </a>
+    </nav>
+    <div class="user-info">
+      <div class="name" id="currentUserName"></div>
+      <div class="role">Lead PJ</div>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()"><span data-i18n="logout">Cerrar sesion</span></button>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- ── Dashboard ── -->
+    <div id="pageDashboard" class="page active">
+      <div class="page-header">
+        <h2 data-i18n="nav_dashboard">Dashboard</h2>
+        <div class="lang-switch">
+          <button onclick="setLang('es')" data-lang="es">ES</button>
+          <button onclick="setLang('en')" data-lang="en">EN</button>
+          <button onclick="setLang('fr')" data-lang="fr">FR</button>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="two-col">
+        <div class="card">
+          <h3 data-i18n="pipeline_funnel">Pipeline</h3>
+          <div id="funnelChart"></div>
+        </div>
+        <div class="card">
+          <h3 data-i18n="by_source">Por fuente</h3>
+          <div id="sourceChart"></div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3 data-i18n="recent_activity">Actividad reciente</h3>
+          <div id="activityFeed"></div>
+        </div>
+        <div class="card">
+          <h3 data-i18n="value_summary">Resumen de valor</h3>
+          <div id="valueSummary"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Leads ── -->
+    <div id="pageLeads" class="page">
+      <div class="page-header">
+        <h2 data-i18n="nav_leads">Leads</h2>
+        <button class="btn btn-primary" onclick="openLeadModal()">+ <span data-i18n="new_lead">Nuevo Lead</span></button>
+      </div>
+      <div class="filters">
+        <input type="text" id="searchInput" data-i18n-placeholder="search_leads" placeholder="Buscar leads..." oninput="renderLeads()">
+        <select id="filterStatus" onchange="renderLeads()">
+          <option value="" data-i18n="all_statuses">Todos los estados</option>
+          <option value="nuevo" data-i18n="status_nuevo">Nuevo</option>
+          <option value="contactado" data-i18n="status_contactado">Contactado</option>
+          <option value="en_negociacion" data-i18n="status_en_negociacion">En negociacion</option>
+          <option value="cerrado_ganado" data-i18n="status_cerrado_ganado">Cerrado ganado</option>
+          <option value="cerrado_perdido" data-i18n="status_cerrado_perdido">Cerrado perdido</option>
+        </select>
+        <select id="filterAssigned" onchange="renderLeads()">
+          <option value="" data-i18n="all_users">Todos</option>
+        </select>
+        <select id="filterSource" onchange="renderLeads()">
+          <option value="" data-i18n="all_sources">Todas las fuentes</option>
+          <option value="manual">Manual</option>
+          <option value="referral">Referral</option>
+          <option value="website">Website</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="event">Event</option>
+          <option value="other" data-i18n="source_other">Otro</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortLeads('company_name')" data-i18n="col_company">Empresa <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('contact_name')" data-i18n="col_contact">Contacto <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('status')" data-i18n="col_status">Estado <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('assigned_to')" data-i18n="col_assigned">Asignado <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('value')" data-i18n="col_value">Valor <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('source')" data-i18n="col_source">Fuente <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('updated_at')" data-i18n="col_updated">Actualizado <span class="sort-icon"></span></th>
+                <th data-i18n="col_actions">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="leadsPagination"></div>
+      </div>
+    </div>
+
+    <!-- ── Pipeline ── -->
+    <div id="pagePipeline" class="page">
+      <div class="page-header">
+        <h2 data-i18n="nav_pipeline">Pipeline</h2>
+        <button class="btn btn-primary" onclick="openLeadModal()">+ <span data-i18n="new_lead">Nuevo Lead</span></button>
+      </div>
+      <div class="kanban" id="kanbanBoard"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Lead Modal ── -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <h3 id="leadModalTitle" data-i18n="new_lead">Nuevo Lead</h3>
+    <form id="leadForm" onsubmit="saveLead(event)">
+      <input type="hidden" id="leadId">
+      <div class="field">
+        <label data-i18n="col_company">Empresa</label>
+        <input type="text" id="fCompany" required>
+      </div>
+      <div class="two-fields">
+        <div class="field">
+          <label data-i18n="col_contact">Contacto</label>
+          <input type="text" id="fContact">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="fEmail">
+        </div>
+      </div>
+      <div class="two-fields">
+        <div class="field">
+          <label data-i18n="phone">Telefono</label>
+          <input type="text" id="fPhone">
+        </div>
+        <div class="field">
+          <label>Website</label>
+          <input type="text" id="fWebsite">
+        </div>
+      </div>
+      <div class="two-fields">
+        <div class="field">
+          <label data-i18n="col_source">Fuente</label>
+          <select id="fSource">
+            <option value="manual">Manual</option>
+            <option value="referral">Referral</option>
+            <option value="website">Website</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="event">Event</option>
+            <option value="other" data-i18n="source_other">Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="col_status">Estado</label>
+          <select id="fStatus">
+            <option value="nuevo" data-i18n="status_nuevo">Nuevo</option>
+            <option value="contactado" data-i18n="status_contactado">Contactado</option>
+            <option value="en_negociacion" data-i18n="status_en_negociacion">En negociacion</option>
+            <option value="cerrado_ganado" data-i18n="status_cerrado_ganado">Cerrado ganado</option>
+            <option value="cerrado_perdido" data-i18n="status_cerrado_perdido">Cerrado perdido</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-fields">
+        <div class="field">
+          <label data-i18n="col_assigned">Asignado a</label>
+          <select id="fAssigned"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="col_value">Valor (EUR)</label>
+          <input type="number" id="fValue" step="0.01" min="0" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="notes">Notas</label>
+        <textarea id="fNotes"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeLeadModal()" data-i18n="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Detail Panel ── -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-panel">
+    <div class="detail-header">
+      <h3 id="detailTitle"></h3>
+      <button class="btn-icon" onclick="closeDetail()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="detail-info" id="detailInfo"></div>
+    <div class="quick-actions" id="quickActions"></div>
+    <h3 style="font-size:0.85rem;color:var(--text2);margin-bottom:12px" data-i18n="activity_history">Historial de actividad</h3>
+    <div class="timeline" id="detailTimeline"></div>
+  </div>
+</div>
+
+<!-- ── Note/Activity Modal ── -->
+<div class="modal-overlay" id="activityModal">
+  <div class="modal" style="width:400px">
+    <h3 id="activityModalTitle" data-i18n="add_note">Agregar nota</h3>
+    <form id="activityForm" onsubmit="saveActivity(event)">
+      <input type="hidden" id="actLeadId">
+      <input type="hidden" id="actType" value="note">
+      <div class="field">
+        <label data-i18n="description">Descripcion</label>
+        <textarea id="actDesc" required></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeActivityModal()" data-i18n="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Lost Reason Modal ── -->
+<div class="modal-overlay" id="lostReasonModal">
+  <div class="modal" style="width:400px">
+    <h3 data-i18n="lost_reason">Razon de perdida</h3>
+    <form id="lostReasonForm" onsubmit="saveLostReason(event)">
+      <input type="hidden" id="lostLeadId">
+      <div class="field">
+        <label data-i18n="lost_reason_label">Por que se perdio este lead?</label>
+        <textarea id="lostReasonText" required></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeLostReasonModal()" data-i18n="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-danger" data-i18n="confirm_lost">Confirmar perdido</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script src="leads-ui.js"></script>
+<script src="pipeline-ui.js"></script>
+</body>
+</html>
