@@ -13,7 +13,7 @@ let sortCol = 'created_at';
 let sortDir = 'desc';
 let currentPage = 1;
 const PAGE_SIZE = 25;
-let currentLang = localStorage.getItem('leadpj_lang') || 'es';
+let currentLang = localStorage.getItem('leadpj_lang') || 'fr';
 
 /* ── i18n ── */
 const i18n = {
@@ -66,6 +66,7 @@ const i18n = {
     q1: '1 — Mínimo: apenas relevante, archivar para futuro',
     email_lang: 'Idioma email',
     select_lang: 'Seleccionar idioma del email',
+    all_qualities: 'Todas las calidades',
   },
   en: {
     login_sub: 'Manage your leads simply and powerfully',
@@ -116,6 +117,7 @@ const i18n = {
     q1: '1 — Minimal: barely relevant, archive for future',
     email_lang: 'Email language',
     select_lang: 'Select email language',
+    all_qualities: 'All qualities',
   },
   fr: {
     login_sub: 'Gérez vos leads simplement et puissamment',
@@ -166,6 +168,7 @@ const i18n = {
     q1: '1 — Minimal : à peine pertinent, archiver pour le futur',
     email_lang: "Langue de l'email",
     select_lang: "Sélectionner la langue de l'email",
+    all_qualities: 'Toutes les qualités',
   }
 };
 
@@ -388,7 +391,7 @@ function generateEmailTemplate(lead, lang) {
 
 Me llamo ${callerName} y me pongo en contacto con usted en nombre de ${companyName}.
 
-Hemos identificado a ${lead.company_name} como una empresa destacada en el sector ${industry} en Luxemburgo, y nos encantaría invitar${title ? ' a ' + contactFirst : 'le'} a formar parte de nuestra comunidad de profesionales y decisores.
+Hemos identificado a ${lead.company_name} como una empresa destacada en el sector ${industry} en Luxemburgo, y nos encantaría invitarle a formar parte de nuestra comunidad de profesionales y decisores.
 
 ${companyName} reúne a los líderes del tejido empresarial luxemburgués — es un espacio de networking de alto nivel, eventos exclusivos y oportunidades de visibilidad para empresas como la suya.
 
@@ -398,7 +401,7 @@ En este mes de ${month} ${year} estamos ampliando nuestra red en el sector ${ind
 
 ${calLink}
 
-Solo necesito su número de móvil y la hora que le convenga, y ${callerName} se pondrá en contacto personalmente con usted.
+Me pondré en contacto personalmente con usted en la fecha y hora que le convenga.
 
 Quedo a su disposición.
 
@@ -413,7 +416,7 @@ Luxembourg`
 
 My name is ${callerName} and I'm reaching out on behalf of ${companyName}.
 
-We've identified ${lead.company_name} as a standout company in the ${industry} sector in Luxembourg, and we'd love to invite you to join our community of professionals and decision-makers.
+We've identified ${lead.company_name} as a standout company in the ${industry} sector in Luxembourg, and I'd love to invite you to join our community of professionals and decision-makers.
 
 ${companyName} brings together leaders of Luxembourg's business landscape — offering high-level networking, exclusive events, and visibility opportunities for companies like yours.
 
@@ -423,7 +426,7 @@ Would you be open to a brief conversation about the benefits of joining? I'd lik
 
 ${calLink}
 
-Simply leave your mobile number and preferred time, and ${callerName} will personally get in touch with you.
+I will personally get in touch with you at the date and time that suits you best.
 
 Looking forward to hearing from you.
 
@@ -436,9 +439,9 @@ Luxembourg`
       subject: `${contactFirst}, une invitation exclusive pour ${lead.company_name} — ${companyName}`,
       body: `${title ? 'Cher' : 'Cher/Chère'} ${contactFirst},
 
-Je me appelle ${callerName} et je vous contacte au nom de ${companyName}.
+Je m'appelle ${callerName} et je vous contacte au nom de ${companyName}.
 
-Nous avons identifié ${lead.company_name} comme une entreprise remarquable dans le secteur ${industry} au Luxembourg, et nous serions ravis de vous inviter à rejoindre notre communauté de professionnels et de décideurs.
+Nous avons identifié ${lead.company_name} comme une entreprise remarquable dans le secteur ${industry} au Luxembourg, et je serais ravi de vous inviter à rejoindre notre communauté de professionnels et de décideurs.
 
 ${companyName} rassemble les leaders du tissu économique luxembourgeois — un espace de networking de haut niveau, d'événements exclusifs et d'opportunités de visibilité pour des entreprises comme la vôtre.
 
@@ -448,7 +451,7 @@ Seriez-vous disponible pour un bref échange sur les avantages de l'adhésion ? 
 
 ${calLink}
 
-Il vous suffit de laisser votre numéro de mobile et l'heure qui vous convient, et ${callerName} vous contactera personnellement.
+Je vous contacterai personnellement à la date et à l'heure qui vous conviennent.
 
 Je reste à votre disposition.
 
@@ -473,9 +476,9 @@ function showTemplateModal(leadId) {
       <div style="margin-bottom:16px">
         <label style="font-size:0.78rem;color:var(--text2);margin-bottom:6px;display:block">${t('email_lang')}</label>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm btn-secondary tmpl-lang active" data-tlang="es" onclick="switchTemplateLang('${leadId}','es',this)">Español</button>
-          <button class="btn btn-sm btn-secondary tmpl-lang" data-tlang="en" onclick="switchTemplateLang('${leadId}','en',this)">English</button>
-          <button class="btn btn-sm btn-secondary tmpl-lang" data-tlang="fr" onclick="switchTemplateLang('${leadId}','fr',this)">Français</button>
+          <button class="btn btn-sm btn-secondary tmpl-lang${currentLang==='es'?' active':''}" data-tlang="es" onclick="switchTemplateLang('${leadId}','es',this)">Español</button>
+          <button class="btn btn-sm btn-secondary tmpl-lang${currentLang==='en'?' active':''}" data-tlang="en" onclick="switchTemplateLang('${leadId}','en',this)">English</button>
+          <button class="btn btn-sm btn-secondary tmpl-lang${currentLang==='fr'?' active':''}" data-tlang="fr" onclick="switchTemplateLang('${leadId}','fr',this)">Français</button>
         </div>
       </div>
       <div id="tmplContent"></div>
@@ -485,7 +488,7 @@ function showTemplateModal(leadId) {
     </div>
   `;
   document.body.appendChild(modal);
-  switchTemplateLang(leadId, 'es', modal.querySelector('.tmpl-lang'));
+  switchTemplateLang(leadId, currentLang, modal.querySelector('.tmpl-lang.active'));
 }
 
 function switchTemplateLang(leadId, lang, btn) {

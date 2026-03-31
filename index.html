@@ -126,12 +126,29 @@
         </select>
         <select id="filterSource" onchange="renderLeads()">
           <option value="" data-i18n="all_sources">Todas las fuentes</option>
-          <option value="manual">Manual</option>
-          <option value="referral">Referral</option>
-          <option value="website">Website</option>
           <option value="linkedin">LinkedIn</option>
+          <option value="website">Website</option>
+          <option value="referral">Referral</option>
+          <option value="cold_outreach">Cold Outreach</option>
+          <option value="paperjam_event">Paperjam Event</option>
+          <option value="bce_registry">BCE Registry</option>
+          <option value="networking">Networking</option>
+          <option value="manual">Manual</option>
           <option value="event">Event</option>
           <option value="other" data-i18n="source_other">Otro</option>
+        </select>
+        <select id="filterQuality" onchange="renderLeads()">
+          <option value="" data-i18n="all_qualities">Toutes les qualités</option>
+          <option value="10">⭐ 10</option>
+          <option value="9">9</option>
+          <option value="8">8</option>
+          <option value="7">7</option>
+          <option value="6">6</option>
+          <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
         </select>
       </div>
       <div class="card">
@@ -141,9 +158,8 @@
               <tr>
                 <th onclick="sortLeads('company_name')" data-i18n="col_company">Empresa <span class="sort-icon"></span></th>
                 <th onclick="sortLeads('contact_name')" data-i18n="col_contact">Contacto <span class="sort-icon"></span></th>
+                <th onclick="sortLeads('contact_title')" data-i18n="contact_title">Cargo <span class="sort-icon"></span></th>
                 <th onclick="sortLeads('status')" data-i18n="col_status">Estado <span class="sort-icon"></span></th>
-                <th onclick="sortLeads('assigned_to')" data-i18n="col_assigned">Asignado <span class="sort-icon"></span></th>
-                <th onclick="sortLeads('value')" data-i18n="col_value">Valor <span class="sort-icon"></span></th>
                 <th onclick="sortLeads('source')" data-i18n="col_source">Fuente <span class="sort-icon"></span></th>
                 <th onclick="sortLeads('updated_at')" data-i18n="col_updated">Actualizado <span class="sort-icon"></span></th>
                 <th data-i18n="col_actions">Acciones</th>

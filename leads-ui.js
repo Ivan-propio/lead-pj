@@ -5,11 +5,13 @@ function renderLeads() {
   const filterStatus = document.getElementById('filterStatus')?.value || '';
   const filterAssigned = document.getElementById('filterAssigned')?.value || '';
   const filterSource = document.getElementById('filterSource')?.value || '';
+  const filterQuality = document.getElementById('filterQuality')?.value || '';
 
   let filtered = allLeads.filter(l => {
     if (filterStatus && l.status !== filterStatus) return false;
     if (filterAssigned && l.assigned_to !== filterAssigned) return false;
     if (filterSource && l.source !== filterSource) return false;
+    if (filterQuality && (l.quality_score || 5) !== parseInt(filterQuality)) return false;
     if (search) {
       const hay = [l.company_name, l.contact_name, l.contact_email, l.industry, l.city].join(' ').toLowerCase();
       if (!hay.includes(search)) return false;
@@ -52,9 +54,8 @@ function renderLeads() {
         <div>${escHtml(l.contact_name || '—')}</div>
         <div style="font-size:0.7rem;color:var(--text3)">${escHtml(l.contact_email || '')}</div>
       </td>
+      <td style="font-size:0.8rem;color:var(--text2)">${escHtml(l.contact_title || '—')}</td>
       <td>${statusPill(l.status)}</td>
-      <td>${getUserName(l.assigned_to)}</td>
-      <td style="font-weight:600">€${formatNum(l.value || 0)}</td>
       <td>${l.source || '—'}</td>
       <td style="font-size:0.75rem;color:var(--text3)">${timeAgo(l.updated_at || l.created_at)}</td>
       <td onclick="event.stopPropagation()">
@@ -69,13 +70,18 @@ function renderLeads() {
         </div>
       </td>
     </tr>
-  `).join('') : `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">${t('no_leads')}</td></tr>`;
+  `).join('') : `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">${t('no_leads')}</td></tr>`;
 
   // Pagination
   document.getElementById('leadsPagination').innerHTML = `
+    <button ${currentPage <= 1 ? 'disabled' : ''} onclick="currentPage=1;renderLeads()">⟨⟨</button>
     <button ${currentPage <= 1 ? 'disabled' : ''} onclick="currentPage--;renderLeads()">←</button>
-    <span>${currentPage} / ${totalPages} (${filtered.length} leads)</span>
+    <span style="display:inline-flex;align-items:center;gap:6px">
+      <input type="number" min="1" max="${totalPages}" value="${currentPage}" style="width:52px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);text-align:center;font-size:0.82rem" onchange="goToPage(this.value,${totalPages})" onkeydown="if(event.key==='Enter'){goToPage(this.value,${totalPages})}">
+      / ${totalPages} (${filtered.length} leads)
+    </span>
     <button ${currentPage >= totalPages ? 'disabled' : ''} onclick="currentPage++;renderLeads()">→</button>
+    <button ${currentPage >= totalPages ? 'disabled' : ''} onclick="currentPage=${totalPages};renderLeads()">⟩⟩</button>
   `;
 }
 
@@ -92,6 +98,11 @@ async function toggleCheck(leadId, field) {
   await sb.from('leadpj_leads').update({ [field]: newVal, updated_at: new Date().toISOString() }).eq('id', leadId);
   renderLeads();
   if (document.getElementById('pagePipeline').classList.contains('active')) renderPipeline();
+}
+
+function goToPage(val, max) {
+  const p = parseInt(val);
+  if (p >= 1 && p <= max) { currentPage = p; renderLeads(); }
 }
 
 function sortLeads(col) {
